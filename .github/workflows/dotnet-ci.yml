@@ -27,8 +27,8 @@ jobs:
 
       # 4️⃣ Build project
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build WebApplication5/WebApplication5.csproj --configuration Release --no-restore
 
       # 5️⃣ Run tests (optional if you have a test project)
       - name: Run unit tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test WebApplication5/WebApplication5.csproj --no-build --verbosity normal
