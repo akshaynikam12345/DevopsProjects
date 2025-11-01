@@ -32,3 +32,14 @@ jobs:
       # 5️⃣ Run tests (optional if you have a test project)
       - name: Run unit tests
         run: dotnet test WebApplication5/WebApplication5.csproj --no-build --verbosity normal
+
+      # Step 5: Publish (output to folder)
+      - name: Publish
+        run: dotnet publish WebApplication5/WebApplication5.csproj --configuration Release --no-build --output ./publish
+
+      # Step 6: Upload published output as artifact (optional)
+      - name: Upload published files
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-app
+          path: ./publish
