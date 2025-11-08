@@ -1,9 +1,7 @@
-name: .NET CI Pipeline
+name: Deploy .NET App to Windows VM
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 jobs:
@@ -43,3 +41,31 @@ jobs:
         with:
           name: published-app
           path: ./publish
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: published-app
+        path: ./deploy
+
+    - name: Deploy to Windows VM
+      uses: appleboy/ssh-action@v1.1.0
+      with:
+        host: ${{ secrets.WINDOWS_VM_HOST }}
+        username: ${{ secrets.WINDOWS_VM_USER }}
+        password: ${{ secrets.WINDOWS_VM_PASS }}
+        script_stop: true
+        script: |
+          # Create app folder
+          if (!(Test-Path "C:\inetpub\myapp")) { New-Item -ItemType Directory -Path "C:\inetpub\myapp" }
+
+          # Copy files
+          Copy-Item -Path "C:\Users\${{ secrets.WINDOWS_VM_USER }}\actions-runner\_work\<repo_name>\<repo_name>\deploy\*" -Destination "C:\inetpub\myapp" -Recurse -Force
+
+          # Restart IIS (if applicable)
+          iisreset
